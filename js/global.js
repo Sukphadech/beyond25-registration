@@ -87,8 +87,10 @@ const btn_registerSubmit = document.getElementById("btn_registerSubmit");
 const btn_paid = document.getElementById("btn_paid");
 const inf_error = document.getElementById("inf_error");
 const accountNumber = document.getElementById("accountNumber").textContent;
-let data = [];
+const fileInput = document.getElementById("paymentSlip");
 
+let data = [];
+let selectedUser = null;
 
 window.addEventListener("DOMContentLoaded", function () {
   const paymentForm = document.getElementById("paymentForm");
@@ -106,6 +108,7 @@ window.addEventListener("DOMContentLoaded", function () {
 
   btn_paid.disabled = true;
   btn_paid.style.opacity = "0.2";
+  btn_paid.style.pointerEvents = "none";
 
   needPayment.disabled = true;
   needPayment.style.opacity = "0.2";
@@ -212,24 +215,37 @@ alreadyRegistered.addEventListener('change', async function () {
         registerForm.style.userSelect = "none";
         paymentForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
+  btn_paid.disabled = true;
+  btn_paid.style.opacity = "0.2";
+  btn_paid.style.pointerEvents = "none";
   enablePaymentForm();
   const userList = document.getElementById("userList");
   const sheetUrl = "https://corsproxy.io/?" + encodeURIComponent("https://script.google.com/macros/s/AKfycbz04POC0bDuB1OkCxT6rqJp1HVD6thvinQTwtCdlWJ-D4HCeKh_SmUy5CIO2jMtW146qA/exec");
   try {
+  // ✅ ถ้ามีข้อมูลอยู่แล้ว ไม่ต้องโหลดใหม่
+  if (data && data.length > 0) {
+    console.log("📦 ข้ามการโหลด — ใช้ข้อมูลเดิมจาก cache:", data.length, "รายการ");
+  } else {
+    // โหลดครั้งแรกเท่านั้น
+    userList.innerHTML = '<option disabled selected>กำลังโหลดรายชื่อ....</option>';
     const response = await fetch(sheetUrl);
     data = await response.json();
-    userList.innerHTML = '<option disabled selected>เลือกรายชื่อ</option>';
-    data.forEach(user => {
-      const option = document.createElement("option");
-      option.value = `${user.nickname}-${user.line}`;
-      option.textContent = `${user.nickname}-${user.line}`;
-      option.id = `${user.nickname}-${user.line}`; 
-      userList.appendChild(option);
-    });
-    console.log("โหลดรายชื่อสำเร็จ:", data);
-  } catch (error) {
-    console.error("โหลดรายชื่อไม่สำเร็จ:", error);
+    console.log("✅ โหลดรายชื่อสำเร็จ:", data.length, "รายการ");
   }
+
+  // ✅ ไม่ว่าจะโหลดใหม่หรือใช้ cache — ก็สร้าง dropdown ทุกครั้ง
+  userList.innerHTML = '<option disabled selected>เลือกรายชื่อ</option>';
+  data.forEach(user => {
+    const option = document.createElement("option");
+    option.value = `${user.nickname}-${user.line}`;
+    option.textContent = `${user.nickname}-${user.line}`;
+    option.id = `${user.nickname}-${user.line}`;
+    userList.appendChild(option);
+  });
+
+} catch (error) {
+  console.error("❌ โหลดรายชื่อไม่สำเร็จ:", error);
+}
   
 });
 
@@ -241,8 +257,11 @@ $('#userList').on('select2:select', function (e) {
     ? selectedValue.split('-')
     : [selectedValue, ''];
   const user = data.find(u => u.nickname === nickname && u.line === line);
+
   console.log("🧩 user ที่พบ:", user);
   if (user) {
+    selectedUser = user;
+    checkPaidButtonStatus();
     let price = 0;
     if (user.ticket.includes("Early Bird")) price = 1100;
     else if (user.ticket.includes("1 วัน")) price = 800;
@@ -298,6 +317,7 @@ needPayment.addEventListener('change', function () {
 
         btn_paid.disabled = true;
         btn_paid.style.opacity = "0.2";
+        btn_paid.style.pointerEvents = "none";
 
       paymentForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
       enablePaymentForm();
@@ -377,59 +397,80 @@ document.getElementById("btn_registerSubmit").addEventListener("click", async fu
     const result = await response.json();
     console.log("ผลลัพธ์จาก Script:", result);
 
-    // if (result.result === "success") {
-    //   alert("✅ บันทึกสำเร็จสำหรับ " + result.user);
-    // } else {
-    //   alert("❌ บันทึกไม่สำเร็จ: " + result.message);
-    // }
-
   } catch (error) {
     console.error("❌ เกิดข้อผิดพลาด:", error);
     alert("เกิดข้อผิดพลาดระหว่างส่งข้อมูล");
   }
 });
 
-document.getElementById("btn_paid").addEventListener("click", async function(e) {
-  e.preventDefault();
 
-  const userSelect = document.getElementById("userList");
-  const selectedOption = userSelect.options[userSelect.selectedIndex];
-  const nickname = selectedOption.value;
-  const line = selectedOption.textContent.split("-")[1].trim();
 
-  const slipFile = document.getElementById("paymentSlip").files[0];
-  if (!slipFile) {
-    alert("กรุณาแนบสลิปก่อนส่งค่ะ");
+btn_paid.addEventListener("click", async () => {
+  const fileInput = document.getElementById("paymentSlip");
+  const file = fileInput.files[0];
+  
+  if (!selectedUser) {
+    alert("กรุณาเลือกรายชื่อก่อนค่ะ");
     return;
   }
 
-  const formData = new FormData();
-  formData.append("nickname", nickname);
-  formData.append("line", line);
-  formData.append("file", slipFile);
+  if (!file) {
+    alert("กรุณาแนบสลิปก่อนส่งค่ะ");
+    return;
+  }
+  
+  const reader = new FileReader();
+  reader.onloadend = async function () {
+    const slipBase64 = reader.result;
+    const payload = {
+      nickname: selectedUser.nickname,
+      line: selectedUser.line,
+      slip: slipBase64
+    };
 
-  const scriptUrl = "https://corsproxy.io/?" + encodeURIComponent("https://script.google.com/macros/s/AKfycbyu9lwIg5qiqGwtAfayS7qPJT9nee1PXOEy3JZFjdke2aBjERdbobJ-fzTLHvcIwyuOxA/exec");
+    const scriptUrl = "https://script.google.com/macros/s/AKfycbykUNP1tOJC4XqdRmZ2HedodFbhfLOEHdgt-3L4Vvoq1DD1f3RMx2msba13lkQzRPGPPw/exec";
 
-  console.log("กำลังอัปโหลด...", nickname, line);
+    try {
+      const response = await fetch(scriptUrl, {
+        method: "POST",
+        body: JSON.stringify(payload),
+        headers: { "Content-Type": "application/json" }
+      });
+      const result = await response.json();
+      console.log("ผลลัพธ์จาก Server:", result);
+      if (result.success) {
+        alert("✅ อัปโหลดสำเร็จ! ลิงก์ไฟล์: " + result.url);
+      } else {
+        alert("❌ ไม่พบผู้ใช้ในชีต หรืออัปโหลดไม่สำเร็จ");
+      }
+    } catch (err) {
+      console.error("เกิดข้อผิดพลาด:", err);
+      alert("⚠️ เกิดข้อผิดพลาดในการอัปโหลด");
+    }
+  };
 
-  try {
-    const response = await fetch(scriptUrl, {
-      method: "POST",
-      body: formData
+  reader.readAsDataURL(file);
+});
+
+
+
+fileInput.addEventListener("change", function () {
+      checkPaidButtonStatus(); 
     });
 
-    const result = await response.json();
-    console.log("ผลลัพธ์จาก Server:", result);
 
-    // if (result.result === "success") {
-    //   alert("✅ อัปโหลดสำเร็จ! ลิงก์สลิป: " + result.slip);
-    // } else if (result.result === "notfound") {
-    //   alert("⚠️ ไม่พบชื่อในระบบค่ะ กรุณาตรวจสอบอีกครั้ง");
-    // } else {
-    //   alert("❌ เกิดข้อผิดพลาด: " + result.message);
-    // }
-  } catch (error) {
-    console.error("Error:", error);
-    alert("❌ อัปโหลดไม่สำเร็จ กรุณาลองใหม่อีกครั้งค่ะ");
-  }
-});
+function checkPaidButtonStatus() {
+      const hasUser = selectedUser !== null;
+      const hasFile = fileInput.files.length > 0;
+      if (hasUser && hasFile) {
+        btn_paid.disabled = false;
+        btn_paid.style.opacity = "1";
+        btn_paid.style.pointerEvents = "auto";
+        console.log("✅ เปิดปุ่มชำระเงินแล้ว");
+      } else {
+        btn_paid.disabled = true;
+        btn_paid.style.opacity = "0.2";
+        btn_paid.style.pointerEvents = "none";
+        console.log("⛔ ปิดปุ่มชำระเงิน (ยังไม่ครบเงื่อนไข)");
+      }
+    }
