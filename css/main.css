@@ -164,7 +164,7 @@ h6 {
   background: #105d1f;
 }
 .bg-gray {
-  background: #343825;
+  background: #42113f;
 }
 
 /* ==========================================================================
@@ -217,12 +217,13 @@ h6 {
   border-radius: 3px;
 }
 
-.btn--green {
-  background: #57b846;
+
+.btn--color {
+  background: #9637a7;
 }
 
-.btn--green:hover {
-  background: #4dae3c;
+.btn--color:hover {
+  background: #c053b3;
 }
 
 /* ==========================================================================
@@ -455,8 +456,8 @@ Check Box
 
 /* เมื่อถูกเลือก */
 .form-check-input-square:checked {
-  background-color: #00c851;
-  border-color: #00c851;
+  background-color: #982293;
+  border-color: #801e87;
 }
 
 /* เอฟเฟกต์ติ๊กถูก */
@@ -492,7 +493,7 @@ Check Box
 }
 
 .copyBtn{
-  background-color: #28a745;
+  background-color: #a22785;
   color: white;
   border: none;
   padding: 3px 8px;
@@ -529,8 +530,8 @@ Check Box
 }
 
 .card-1 .card-heading {
-  background: url("../images/img_Beyond24_poster.jpg") center center/cover no-repeat;
-  padding-top: 210px;
+  background: url("../images/img_Artistry_poster.jfif") center center/cover no-repeat;
+  padding-top: 350px;
 }
 
 .card-1 .card-body {
@@ -545,4 +546,8 @@ Check Box
     padding-top: 40px;
     padding-bottom: 40px;
   }
+}
+
+.search-box {
+  display: none;
 }

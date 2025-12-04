@@ -10,7 +10,7 @@
     <meta name="keywords" content="Colorlib Templates">
 
     <!-- Title Page-->
-    <title>Beyond Register</title>
+    <title>Artistry Register</title>
 
     <!-- Icons font CSS-->
     <link href="vendor/mdi-font/css/material-design-iconic-font.min.css" rel="stylesheet" media="all">
@@ -35,11 +35,14 @@
                     <h2 class="title">ลงทะเบียน</h2>
                     <form method="POST" id="registerForm">
                         <div class="input-group">
-                        <div class="rs-select2 js-select-simple select--no-search">
+                        <div class="rs-select2 js-select-simple">
                             <select id="userList" name="userList">
-                            <option disabled selected>กำลังโหลดรายชื่อ....</option>'
+                                <option disabled selected>กำลังโหลดรายชื่อ....</option>
                             </select>
-                            <div class="select-dropdown"></div>
+                            <!-- กล่อง dropdown -->
+                            <div class="select-dropdown">
+                                <input type="text" id="searchUser" class="search-box" placeholder="ค้นหารายชื่อ...">
+                            </div>
                         </div>
                         </div>
                         <div class="checkbox-group">
@@ -59,18 +62,7 @@
                             </div>
                         </div>
 
-                        <div class="input-group">
-                            <div class="rs-select2 js-select-simple select--no-search">
-                                <select id="ticketType" name="class">
-                                    <option disabled="disabled" selected="selected">เลือกประเภทบัตร</option>
-                                    <!-- <option  value="Early Bird" id="ticket_earlybird">Early Bird</option> -->
-                                    <option  value="ทั่วไป 2 วัน" id="ticket_earlybird">ทั่วไป 2 วัน</option>
-                                    <option value="วันเสาร์ 1 วัน" id="ticket_saturday">วันเสาร์ 1 วัน</option>
-                                    <option value="วันอาทิตย์ 1 วัน" id="ticket_sunday">วันอาทิตย์ 1 วัน</option>
-                                </select>
-                                <div class="select-dropdown"></div>
-                            </div>
-                        </div>
+                        
                         <div class="form-outline mb-4">
                         <div class="input-group">
                             <input id="fullname" class="input--style-1" type="text" placeholder="ชื่อ-นามสกุล" name="fullname">
@@ -90,7 +82,7 @@
                         </div>
                         <div id="inf_error"></div>
                         <div class="p-t-20">
-                            <button id="btn_registerSubmit" class="btn btn--radius btn--green" type="button">ลงทะเบียน</button>
+                            <button id="btn_registerSubmit" class="btn btn--radius btn--color" type="button">ลงทะเบียน</button>
                         </div>
                         
                     </form>
@@ -111,15 +103,13 @@
                     <span id="accountNumber" style="font-weight: bold;">7774866328</span> 
                     ธีรพงษ์ นิลมานนท์
                     <button id="copyBtn" class="copyBtn">คัดลอก</button>
-                    <br>
-                    <span style="font-size: 14px;">
-                        Early Bird 1,100 BTH / รอบทั่วไป 1,350 BTH / บัตรวันเดียว 800 BTH
-                    </span>
+         
+            
                     </div>
                     <br>
                     <form method="POST" id="paymentForm">
                         <div class="p-t-20">
-                            <button id="btn_edit" class="btn btn--radius btn--green"  type="button">แก้ไขข้อมูล</button>
+                            <button id="btn_edit" class="btn btn--radius btn--color"  type="button">แก้ไขข้อมูล</button>
                         </div>
                         <br>
                         
@@ -139,7 +129,7 @@
                             <small class="text-muted">รองรับไฟล์ .jpg, .jpeg, .png</small>
                         </div>
                         <div class="p-t-20">
-                            <button id="btn_paid" class="btn btn--radius btn--green" type="button">ชำระเงิน</button>
+                            <button id="btn_paid" class="btn btn--radius btn--color" type="button">ชำระเงิน</button>
                         </div>
                     </form>
                 </div>
