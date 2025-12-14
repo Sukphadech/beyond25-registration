@@ -48,7 +48,7 @@ th, td {
     text-align: left;
 }
 th {
-    background: #149b26;
+    background: #7410a2;
     color: white;
 }
 tr:nth-child(even) {
@@ -60,7 +60,7 @@ img {
 }
 button {
     padding: 10px 20px;
-    background: #29b83a;
+    background: #670f85;
     color: white;
     border: none;
     border-radius: 8px;
@@ -68,11 +68,11 @@ button {
     margin-bottom: 20px;
 }
 button:hover {
-    background: #27b229;
+    background: #791888;
 }
 /* สีสถานะ */
 .status-paid {
-    color: #0A8A0A;      /* เขียว */
+    color: #28ad19;      /* เขียว */
     font-weight: bold;
 }
 

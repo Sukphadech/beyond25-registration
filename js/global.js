@@ -172,9 +172,10 @@ async function getAllMembers() {
 
 async function getAllRegister() {
     const res = await fetch(
-        `${SUPABASE_URL}/rest/v1/${TABLE_REGISTER}?select=*`,
-        { headers: SUPABASE_HEADERS }
+    `${SUPABASE_URL}/rest/v1/${TABLE_REGISTER}?select=id,fullname,nickname,line_name,ticket_type,status`,
+    { headers: SUPABASE_HEADERS }
     );
+
 
     if (!res.ok) {
         throw new Error("Supabase select Beyond25 failed");
@@ -360,16 +361,24 @@ NotRegister.addEventListener('change', function () {
 
 
 $('#userList').on('select2:select', function (e) {
-  
+
   const selectedValue = e.params.data.id || e.params.data.text;
   console.log("🟢 เลือก:", selectedValue);
 
   const parts = selectedValue.split("|").map(x => x.trim());
   const nickname = parts[0] || "";
   const fullname = parts[1] || "";
+  
 
   console.log("nickname:", nickname, "fullname:", fullname);
+  needPayment.checked = false;
+  needPayLater.checked = false;
+  needPayment.disabled = true;;
+  needPayment.style.opacity = "0.4"; 
+  needPayLater.disabled = true;;
+  needPayLater.style.opacity = "0.4"; 
 
+  
   let member = registerCache.find(
       m => m.nickname.trim() === nickname && m.fullname.trim() === fullname
   );
